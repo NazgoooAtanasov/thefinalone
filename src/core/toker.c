@@ -15,6 +15,7 @@ const char* token_kind_to_str(TokenKind kind) {
     case TokenKind_Literal: return "Literal";
     case TokenKind_Identifier: return "Identifier";
     case TokenKind_Keyword: return "Keyword";
+    case TokenKind_Comma: return "Comma";
     default: return "Unknown";
   }
 }
@@ -125,6 +126,7 @@ Tokens tokenize(const char* filepath, const char* source) {
       case '(': kind = TokenKind_Open_Paren; break;
       case ')': kind = TokenKind_Close_Paren; break;
       case ':': kind = TokenKind_Column; break;
+      case ',': kind = TokenKind_Comma; break;
       default: fail_if(true, "Unknown token found at line %d, column %d\n", pos.line, pos.column - buff_idx);
     }
     fail_if(kind == TokenKind_UNKNOWN, "Unknown token found at line %d, column %d\n", pos.line, pos.column - buff_idx);

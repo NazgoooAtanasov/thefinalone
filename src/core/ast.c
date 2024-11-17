@@ -1,4 +1,15 @@
 #include "core/ast.h"
+#include "core/toker.h"
+#include "util.h"
+
+#ifdef COMPILER_DEBUG
+const char* ast_type_to_str(Type type) {
+    switch(type) {
+        case Type_i32: return "i32";
+        default: return "UNKNOWN";
+    }
+}
+#endif
 
 Type map_type(TokenKeywordKind kind) {
   switch(kind) {
@@ -15,9 +26,28 @@ Type parse_type(Tokens* tokens) {
 
 ArgumentsNode* parse_arguments_node(Tokens* tokens) {
   ArgumentsNode* arguments = malloc(sizeof(ArgumentsNode));
-  pop_token(tokens); // popping the arguments
-  // @TODO(n) handle function args
-  pop_token(tokens); // popping the arguments
+  memset(arguments, 0, sizeof(ArgumentsNode));
+
+  pop_token(tokens); // popping the opening param
+
+  Token t;
+  do {
+    fail_if(arguments->arguments_count >= AST_MAX_ARGUMENTS,
+        "%s:%d:%d: Error: function has more arguments then the language can handle\n",
+        t.pos.filepath, t.pos.line, t.pos.column);
+
+    t = pop_token(tokens);
+    strncpy(arguments->args[arguments->arguments_count].name, t.raw, TOKEN_RAW_CAPACITY);
+    arguments->args[arguments->arguments_count].type = parse_type(tokens);
+
+    arguments->arguments_count++;
+    t = peek_token(tokens);
+    if (t.kind == TokenKind_Comma) {
+        t = pop_token(tokens);
+    }
+  } while(t.kind == TokenKind_Comma);
+
+  pop_token(tokens); // popping the closing param
   return arguments;
 }
 

@@ -3,3 +3,4 @@
 -Wextra
 -Werror
 -g
+-DCOMPILER_DEBUG

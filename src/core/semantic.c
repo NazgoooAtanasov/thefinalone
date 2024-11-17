@@ -1,8 +1,14 @@
 #include "core/semantic.h"
 #include "util.h"
 
+void check_function_arguments(FunctionNode* function) {
+    fail_if(function->arguments->arguments_count > AST_MAX_ARGUMENTS,
+        "filename:%d:%d: Error: function with name %s has more arguments then the language can handle",
+        0, 0, function->name);
+}
+
 void check_function(FunctionNode* function) {
-  (void) function;
+  check_function_arguments(function);
   // @TODO(n): handle semantic checks per function
 }
 

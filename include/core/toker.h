@@ -13,9 +13,10 @@ typedef enum {
   TokenKind_Literal,
   TokenKind_Identifier,
   TokenKind_Keyword,
+  TokenKind_Column,
+  TokenKind_Comma,
   TokenKind_Open_Paren,
   TokenKind_Close_Paren,
-  TokenKind_Column,
   TokenKind_Open_Curl_Paren,
   TokenKind_Close_Curl_Paren,
   TokenKind_UNKNOWN

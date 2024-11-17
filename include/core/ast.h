@@ -1,6 +1,7 @@
 #ifndef AST_H
 #define AST_H
 
+#include <stdint.h>
 #include <string.h>
 #include "core/toker.h"
 
@@ -9,7 +10,17 @@ typedef enum {
 } Type;
 
 typedef struct {} BodyNode;
-typedef struct {} ArgumentsNode;
+
+typedef struct {
+    char name[TOKEN_RAW_CAPACITY];
+    Type type;
+} Argument;
+
+#define AST_MAX_ARGUMENTS 6
+typedef struct {
+    Argument args[AST_MAX_ARGUMENTS];
+    uint32_t arguments_count;
+} ArgumentsNode;
 
 typedef struct {
   char name[TOKEN_RAW_CAPACITY];
@@ -27,6 +38,11 @@ typedef struct {
 typedef struct {
   RootNode* root;
 } AST;
+
+
+#ifdef COMPILER_DEBUG
+const char* ast_type_to_str(Type type);
+#endif
 
 AST* parse_ast(Tokens* tokens);
 
