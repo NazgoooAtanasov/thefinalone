@@ -1,7 +1,6 @@
 #ifndef TARGET_H
 #define TARGET_H
 
-#include <assert.h>
 #include "core/ast.h"
 #include "vendor/string_builder.h"
 

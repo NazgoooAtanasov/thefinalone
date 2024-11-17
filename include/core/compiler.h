@@ -9,4 +9,3 @@
 AST* compile(const char* filepath);
 
 #endif // COMPILER_H
-
