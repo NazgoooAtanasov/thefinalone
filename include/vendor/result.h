@@ -19,10 +19,16 @@
 #define RESULT_DEF
 #endif
 
+#ifndef RESULT_ERROR_BUFFER_SZ
+#define RESULT_ERROR_BUFFER_SZ 1024 * 8 // ~8KB
+#endif
+
 typedef struct {
   void* value;
-  const char* error;
+  char error[RESULT_ERROR_BUFFER_SZ];
 } Result;
+
+#define result_set_error(result, ...) snprintf((result.error), sizeof(result.error), __VA_ARGS__)
 
 RESULT_DEF Result result_create_empty();
 RESULT_DEF void* result_unwrap(Result* result);
@@ -33,7 +39,7 @@ RESULT_DEF BOOLEAN result_is_err(Result* result);
 
 #ifdef RESULT_H_IMPLEMENTATION
 RESULT_DEF Result result_create_empty() {
-  return (Result) {.value = NULL, .error = NULL};
+  return (Result) {.value = NULL, .error = "\0"};
 }
 
 RESULT_DEF void* result_unwrap(Result* result) {
@@ -46,10 +52,10 @@ RESULT_DEF const char* result_error(Result* result) {
 }
 
 RESULT_DEF BOOLEAN result_is_ok(Result* result) {
-  return result->error == NULL;
+  return result->error[0] == '\0';
 }
 
 RESULT_DEF BOOLEAN result_is_err(Result* result) {
-  return result->error != NULL;
+  return result->error[0] != '\0';
 }
 #endif
