@@ -4,10 +4,10 @@
 
 #ifdef COMPILER_DEBUG
 const char* ast_type_to_str(Type type) {
-    switch(type) {
-        case Type_i32: return "i32";
-        default: return "UNKNOWN";
-    }
+  switch(type) {
+    case Type_i32: return "i32";
+    default: return "UNKNOWN";
+  }
 }
 #endif
 
@@ -37,8 +37,8 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
 
   do {
     fail_if(arguments->arguments_count >= AST_MAX_ARGUMENTS,
-        "%s:%d:%d: Error: function has more arguments then the language can handle\n",
-        t.pos.filepath, t.pos.line, t.pos.column);
+            "%s:%d:%d: Error: function has more arguments then the language can handle\n",
+            t.pos.filepath, t.pos.line, t.pos.column);
 
     t = pop_token(tokens);
     strncpy(arguments->args[arguments->arguments_count].name, t.raw, TOKEN_RAW_CAPACITY);
@@ -47,7 +47,7 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
     arguments->arguments_count++;
     t = peek_token(tokens);
     if (t.kind == TokenKind_Comma) {
-        t = pop_token(tokens);
+      t = pop_token(tokens);
     }
   } while(t.kind == TokenKind_Comma);
 

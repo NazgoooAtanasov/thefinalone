@@ -3,20 +3,20 @@
 #include <stdio.h>
 
 void compile_function_node(FunctionNode* function, StringBuilder* sb) {
-    string_builder_append_str(sb, function->name, strlen(function->name));
-    string_builder_append_str(sb, ":\n", 2);
+  string_builder_append_str(sb, function->name, strlen(function->name));
+  string_builder_append_str(sb, ":\n", 2);
 
-    const char* stack_frame_begin = "\tpush rbp\n"
-                                    "\tmov rbp, rsp\n";
+  const char* stack_frame_begin = "\tpush rbp\n"
+    "\tmov rbp, rsp\n";
 
-    string_builder_append_str(sb, stack_frame_begin, strlen(stack_frame_begin));
+  string_builder_append_str(sb, stack_frame_begin, strlen(stack_frame_begin));
 
-    // @TODO(n): compile body
+  // @TODO(n): compile body
 
-    const char* stack_frame_end = "\tmov rps, rbp\n"
-                                  "\tpop rbp\n"
-                                  "\tret\n";
-    string_builder_append_str(sb, stack_frame_end, strlen(stack_frame_end));
+  const char* stack_frame_end = "\tmov rps, rbp\n"
+    "\tpop rbp\n"
+    "\tret\n";
+  string_builder_append_str(sb, stack_frame_end, strlen(stack_frame_end));
 }
 
 void compile_to_x86_64_nasm(AST* ast, StringBuilder* sb) {
@@ -31,8 +31,8 @@ void compile_to_target(CompileTarget target, AST* ast) {
   StringBuilder sb = {0};
 
   const char* begin = "BITS 64\n"
-                      "global _start\n"
-                      "\n";
+    "global _start\n"
+    "\n";
   string_builder_append_str(&sb, begin, strlen(begin));
 
   switch (target) {
@@ -41,8 +41,8 @@ void compile_to_target(CompileTarget target, AST* ast) {
   }
 
   const char* end = "\n"
-                    "_start:\n"
-                    "\tcall main\n";
+    "_start:\n"
+    "\tcall main\n";
   string_builder_append_str(&sb, end, strlen(end));
 
   printf("%s\n", sb.string);

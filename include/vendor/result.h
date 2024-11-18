@@ -15,8 +15,8 @@
 #endif
 
 typedef struct {
-    void* value;
-    const char* error;
+  void* value;
+  const char* error;
 } Result;
 
 RESULT_DEF Result result_create_empty();
@@ -28,22 +28,22 @@ RESULT_DEF BOOLEAN result_is_err(Result* result);
 
 #ifdef RESULT_H_IMPLEMENTATION
 RESULT_DEF Result result_create_empty() {
-    return (Result) {.value = NULL, .error = NULL};
+  return (Result) {.value = NULL, .error = NULL};
 }
 
 RESULT_DEF void* result_unwrap(Result* result) {
-    return result->value;
+  return result->value;
 }
 
 RESULT_DEF const char* result_error(Result* result) {
-    return result->error;
+  return result->error;
 }
 
 RESULT_DEF BOOLEAN result_is_ok(Result* result) {
-    return result->error == NULL;
+  return result->error == NULL;
 }
 
 RESULT_DEF BOOLEAN result_is_err(Result* result) {
-    return result->error != NULL;
+  return result->error != NULL;
 }
 #endif

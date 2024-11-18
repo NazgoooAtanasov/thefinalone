@@ -14,16 +14,16 @@ typedef enum StatementType {
 } StatementType;
 
 typedef struct {
-    char name[TOKEN_RAW_CAPACITY];
-    Type type;
-    const char literal_value[TOKEN_RAW_CAPACITY];
+  char name[TOKEN_RAW_CAPACITY];
+  Type type;
+  const char literal_value[TOKEN_RAW_CAPACITY];
 } VariableAssignStatement;
 
 typedef struct {
-    StatementType type;
-    union {
-      VariableAssignStatement variable_assign;
-    } statement;
+  StatementType type;
+  union {
+    VariableAssignStatement variable_assign;
+  } statement;
 } StatementNode;
 
 #define AST_MAX_BODY_STATEMENTS 1024
@@ -33,14 +33,14 @@ typedef struct {
 } BodyNode;
 
 typedef struct {
-    char name[TOKEN_RAW_CAPACITY];
-    Type type;
+  char name[TOKEN_RAW_CAPACITY];
+  Type type;
 } Argument;
 
 #define AST_MAX_ARGUMENTS 6
 typedef struct {
-    Argument args[AST_MAX_ARGUMENTS];
-    uint32_t arguments_count;
+  Argument args[AST_MAX_ARGUMENTS];
+  uint32_t arguments_count;
 } ArgumentsNode;
 
 typedef struct {
