@@ -10,6 +10,11 @@
 #define BOOLEAN bool
 #endif
 
+#ifndef RESULT_ASSERT
+#include <assert.h>
+#define RESULT_ASSERT(...) assert(__VA_ARGS__)
+#endif
+
 #ifndef RESULT_DEF
 #define RESULT_DEF
 #endif
@@ -32,6 +37,7 @@ RESULT_DEF Result result_create_empty() {
 }
 
 RESULT_DEF void* result_unwrap(Result* result) {
+  RESULT_ASSERT(result->value != NULL && "[ERROR]: Unwrapping empty value");
   return result->value;
 }
 

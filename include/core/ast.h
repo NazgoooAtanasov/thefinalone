@@ -3,27 +3,31 @@
 
 #include <stdint.h>
 #include "core/toker.h"
+#include "vendor/result.h"
+
 
 typedef enum {
   Type_i32
 } Type;
 
 typedef enum StatementType {
+  StatementType_UNKNOWN,
   StatementType_VariableAssign,
-  StatementType_UNKNOWN
 } StatementType;
+
+#ifdef COMPILER_DEBUG
+const char* ast_statement_type_to_str(StatementType type);
+#endif
 
 typedef struct {
   char name[TOKEN_RAW_CAPACITY];
   Type type;
-  const char literal_value[TOKEN_RAW_CAPACITY];
+  char literal_value[TOKEN_RAW_CAPACITY];
 } VariableAssignStatement;
 
 typedef struct {
   StatementType type;
-  union {
-    VariableAssignStatement variable_assign;
-  } statement;
+  void* statement;
 } StatementNode;
 
 #define AST_MAX_BODY_STATEMENTS 1024

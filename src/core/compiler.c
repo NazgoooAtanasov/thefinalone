@@ -67,6 +67,10 @@ AST* compile(const char* filepath) {
              ast_type_to_str(ast->root->functions[i]->arguments->args[j].type)
              );
     }
+    for (uint32_t j = 0; j < ast->root->functions[i]->body->statements_count; ++j) {
+      printf("\t\t[Statement: %s]\n",
+             ast_statement_type_to_str(ast->root->functions[i]->body->statements[j].type));
+    }
   }
   printf("==== AST ====\n\n");
 #endif

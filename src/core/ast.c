@@ -9,6 +9,13 @@ const char* ast_type_to_str(Type type) {
     default: return "UNKNOWN";
   }
 }
+
+const char* ast_statement_type_to_str(StatementType type) {
+  switch(type) {
+    case StatementType_VariableAssign: return "VariableAssign";
+    default: return "UNKNOWN";
+  }
+}
 #endif
 
 Type map_type(TokenKeywordKind kind) {
@@ -55,11 +62,63 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
   return arguments;
 }
 
+Result parse_variable_assign_node(Tokens* tokens) {
+  Result result = result_create_empty();
+
+  Token name = pop_token(tokens);
+  if (name.kind != TokenKind_Identifier) {
+    result.error = "Expected identifier, found something else";
+    return result;
+  }
+
+  Type type = parse_type(tokens);
+
+  Token t = pop_token(tokens);
+  if (t.kind != TokenKind_Eq) {
+    result.error = "Expected '=', found something else";
+    return result;
+  }
+
+  Token value = pop_token(tokens);
+  if (value.kind != TokenKind_Literal) {
+    result.error = "Expected literal value, found something else";
+    return result;
+  }
+
+  t = pop_token(tokens);
+  if (t.kind != TokenKind_Semi) {
+    result.error = "Expected ';', found something else";
+    return result;
+  }
+
+  VariableAssignStatement* variable_assign = malloc(sizeof(VariableAssignStatement));
+
+  strncpy(variable_assign->name, name.raw, TOKEN_RAW_CAPACITY);
+  variable_assign->type = type;
+  strncpy(variable_assign->literal_value, value.raw, TOKEN_RAW_CAPACITY);
+
+  result.value = variable_assign;
+
+  return result;
+}
+
 BodyNode* parse_body_node(Tokens* tokens) {
   BodyNode* body = malloc(sizeof(BodyNode));
   memset(body, 0, sizeof(BodyNode));
 
   pop_token(tokens); // popping the body
+
+  Token t = peek_token(tokens);
+  if (t.kind == TokenKind_Identifier) {
+    Result variable_assign = parse_variable_assign_node(tokens);
+    if (result_is_ok(&variable_assign)) {
+      body->statements[body->statements_count].type = StatementType_VariableAssign;
+      body->statements[body->statements_count].statement = result_unwrap(&variable_assign);
+      body->statements_count++;
+    }
+  }
+  // @TODO(n): handle multiple statements in a body.
+
   pop_token(tokens); // popping the body
   return body;
 }
