@@ -19,6 +19,8 @@ typedef enum {
   TokenKind_Close_Paren,
   TokenKind_Open_Curl_Paren,
   TokenKind_Close_Curl_Paren,
+  TokenKind_Eq,
+  TokenKind_Semi,
   TokenKind_UNKNOWN
 } TokenKind;
 

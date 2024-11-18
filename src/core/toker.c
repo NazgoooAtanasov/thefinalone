@@ -2,7 +2,16 @@
 #include "util.h"
 
 #define is_whitespace(c) c == ' ' || c == '\t'
-#define is_alpha_num(c) (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+#define is_num(c) (c >= '0' && c <= '9')
+#define is_alpha_num(c) (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || is_num(c)
+
+bool is_literal(const char* word) {
+  size_t len = strlen(word);
+  for (size_t i = 0; i < len; ++i) {
+    if (!is_num(word[i])) return false;
+  }
+  return true;
+}
 
 #ifdef COMPILER_DEBUG
 const char* token_kind_to_str(TokenKind kind) {
@@ -114,6 +123,10 @@ Tokens tokenize(const char* filepath, const char* source) {
         kind = TokenKind_Keyword;
       }
 
+      if (is_literal(buff)) {
+        kind = TokenKind_Literal;
+      }
+
       Token token = make_token(kind, keyword, (Position) {.filepath = tokens.source, .column = pos.column - buff_idx, .line = pos.line}, buff);
       push_token(&tokens, token);
       continue;
@@ -126,7 +139,9 @@ Tokens tokenize(const char* filepath, const char* source) {
       case '(': kind = TokenKind_Open_Paren; break;
       case ')': kind = TokenKind_Close_Paren; break;
       case ':': kind = TokenKind_Column; break;
+      case ';': kind = TokenKind_Semi; break;
       case ',': kind = TokenKind_Comma; break;
+      case '=': kind = TokenKind_Eq; break;
       default: fail_if(true, "Unknown token found at line %d, column %d\n", pos.line, pos.column - buff_idx);
     }
     fail_if(kind == TokenKind_UNKNOWN, "Unknown token found at line %d, column %d\n", pos.line, pos.column - buff_idx);

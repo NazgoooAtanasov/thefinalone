@@ -1,6 +1,9 @@
 #define STRING_BUILDER_IMPLEMENTATION
 #include "vendor/string_builder.h"
 
+#define RESULT_H_IMPLEMENTATION
+#include "vendor/result.h"
+
 #include "core/cmd.h"
 
 int main(int argc, char** argv) {

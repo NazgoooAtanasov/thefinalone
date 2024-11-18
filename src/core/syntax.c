@@ -1,6 +1,7 @@
 #include "core/syntax.h"
 #include "core/toker.h"
 #include "util.h"
+#include "vendor/result.h"
 
 void parse_func_args(Tokens* tokens) {
     Token t = peek_token(tokens);
@@ -34,11 +35,63 @@ void parse_func_args(Tokens* tokens) {
                    t.pos.filepath, t.pos.line, t.pos.column, t.raw);
 }
 
+Result parse_variable_assign(Tokens* tokens) {
+    Result result = result_create_empty();
+    Token t = pop_token(tokens); // variable name
+
+    t = pop_token(tokens);
+    if (t.kind != TokenKind_Column) {
+        result.error = "Expected ':' but got something else";
+        return result;
+    }
+
+    t = pop_token(tokens);
+    if (t.kind != TokenKind_Keyword || t.keyword != TokenKeywordKind_i32Type) {
+        result.error = "Expected type annotation but got something else";
+        return result;
+    }
+
+    t = pop_token(tokens);
+    if (t.kind != TokenKind_Eq) {
+        result.error = "Expected '=' but got something else";
+        return result;
+    }
+
+    t = pop_token(tokens);
+    if (t.kind != TokenKind_Literal) {
+        result.error = "Expected literal value but got something else";
+        return result;
+    }
+
+    t = pop_token(tokens);
+    if (t.kind != TokenKind_Semi) {
+        result.error = "Expected ';' but got something else";
+        return result;
+    }
+
+    return result;
+}
+
+void parse_statement(Tokens* tokens) {
+    Token t = peek_token(tokens);
+    if (t.kind == TokenKind_Identifier) {
+        Result variable = parse_variable_assign(tokens);
+
+        if (result_is_ok(&variable)) {
+          return;
+        }
+
+        fail_if(result_is_err(&variable), "%s:%d:%d: Error: %s", t.pos.filepath, t.pos.line, t.pos.column, result_error(&variable));
+    }
+}
+
 void parse_body(Tokens* tokens) {
   Token t = pop_token(tokens);
   fail_if(t.kind != TokenKind_Open_Curl_Paren,
           "%s:%d:%d: Error: Expected '%s', but got '%s'\n",
           t.pos.filepath, t.pos.line, t.pos.column, "{", t.raw);
+
+  parse_statement(tokens);
 
   t = pop_token(tokens);
   fail_if(t.kind != TokenKind_Close_Curl_Paren,

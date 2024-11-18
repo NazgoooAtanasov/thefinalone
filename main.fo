@@ -1,1 +1,3 @@
-func main(argc: i32, arg: i32, x: i32, y: i32, b: i32, j: i32, l: i32): i32 {}
+func main(): i32 {
+    thing: i32 = 15;
+}

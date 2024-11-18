@@ -2,14 +2,35 @@
 #define AST_H
 
 #include <stdint.h>
-#include <string.h>
 #include "core/toker.h"
 
 typedef enum {
   Type_i32
 } Type;
 
-typedef struct {} BodyNode;
+typedef enum StatementType {
+  StatementType_VariableAssign,
+  StatementType_UNKNOWN
+} StatementType;
+
+typedef struct {
+    char name[TOKEN_RAW_CAPACITY];
+    Type type;
+    const char literal_value[TOKEN_RAW_CAPACITY];
+} VariableAssignStatement;
+
+typedef struct {
+    StatementType type;
+    union {
+      VariableAssignStatement variable_assign;
+    } statement;
+} StatementNode;
+
+#define AST_MAX_BODY_STATEMENTS 1024
+typedef struct {
+  StatementNode statements[AST_MAX_BODY_STATEMENTS];
+  uint32_t statements_count;
+} BodyNode;
 
 typedef struct {
     char name[TOKEN_RAW_CAPACITY];

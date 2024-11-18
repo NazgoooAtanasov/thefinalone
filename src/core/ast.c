@@ -29,8 +29,12 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
   memset(arguments, 0, sizeof(ArgumentsNode));
 
   pop_token(tokens); // popping the opening param
+  Token t = peek_token(tokens);
+  if (t.kind == TokenKind_Close_Paren) {
+    pop_token(tokens); // popping the close paren
+    return arguments;
+  }
 
-  Token t;
   do {
     fail_if(arguments->arguments_count >= AST_MAX_ARGUMENTS,
         "%s:%d:%d: Error: function has more arguments then the language can handle\n",
@@ -53,8 +57,9 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
 
 BodyNode* parse_body_node(Tokens* tokens) {
   BodyNode* body = malloc(sizeof(BodyNode));
+  memset(body, 0, sizeof(BodyNode));
+
   pop_token(tokens); // popping the body
-  // @TODO(n) handle body
   pop_token(tokens); // popping the body
   return body;
 }
