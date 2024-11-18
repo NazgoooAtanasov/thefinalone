@@ -41,31 +41,37 @@ Result parse_variable_assign(Tokens* tokens) {
 
   t = pop_token(tokens);
   if (t.kind != TokenKind_Column) {
-    result.error = "Expected ':' but got something else";
+    result_set_error(result, "%s:%d:%d: Error: Expected '%s', but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column,
+                     ":", t.raw);
     return result;
   }
 
   t = pop_token(tokens);
   if (t.kind != TokenKind_Keyword || t.keyword != TokenKeywordKind_i32Type) {
-    result.error = "Expected type annotation but got something else";
+    result_set_error(result, "%s:%d:%d: Error: Expected a type, but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column, t.raw);
     return result;
   }
 
   t = pop_token(tokens);
   if (t.kind != TokenKind_Eq) {
-    result.error = "Expected '=' but got something else";
+    result_set_error(result, "%s:%d:%d: Error: Expected '%c', but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column, '=', t.raw);
     return result;
   }
 
   t = pop_token(tokens);
   if (t.kind != TokenKind_Literal) {
-    result.error = "Expected literal value but got something else";
+    result_set_error(result, "%s:%d:%d: Error: Expected literal value, but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column, t.raw);
     return result;
   }
 
   t = pop_token(tokens);
   if (t.kind != TokenKind_Semi) {
-    result.error = "Expected ';' but got something else";
+    result_set_error(result, "%s:%d:%d: Error: Expected '%c', but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column, ';', t.raw);
     return result;
   }
 
@@ -81,7 +87,7 @@ void parse_statement(Tokens* tokens) {
       return;
     }
 
-    fail_if(result_is_err(&variable), "%s:%d:%d: Error: %s", t.pos.filepath, t.pos.line, t.pos.column, result_error(&variable));
+    fail_if(result_is_err(&variable), "%s\n", result_error(&variable));
   }
 }
 

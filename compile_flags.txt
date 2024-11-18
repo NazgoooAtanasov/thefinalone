@@ -1,7 +1,6 @@
 -Iinclude/
 -Wall
 -Wextra
--Werror
 -g
 -DCOMPILER_DEBUG
 -DRESULT_H_IMPLEMENTATION

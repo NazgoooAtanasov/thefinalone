@@ -67,7 +67,9 @@ Result parse_variable_assign_node(Tokens* tokens) {
 
   Token name = pop_token(tokens);
   if (name.kind != TokenKind_Identifier) {
-    result.error = "Expected identifier, found something else";
+    result_set_error(result,
+                     "%s:%d:%d: Error: Expected identifier, found '%s'",
+                     name.pos.filepath, name.pos.line, name.pos.column, name.raw);
     return result;
   }
 
@@ -75,19 +77,25 @@ Result parse_variable_assign_node(Tokens* tokens) {
 
   Token t = pop_token(tokens);
   if (t.kind != TokenKind_Eq) {
-    result.error = "Expected '=', found something else";
+    result_set_error(result,
+                     "%s:%d:%d: Error: Expected '%c', found '%s'",
+                     name.pos.filepath, name.pos.line, name.pos.column, '=', name.raw);
     return result;
   }
 
   Token value = pop_token(tokens);
   if (value.kind != TokenKind_Literal) {
-    result.error = "Expected literal value, found something else";
+    result_set_error(result,
+                     "%s:%d:%d: Error: Expected literal value, found '%s'",
+                     name.pos.filepath, name.pos.line, name.pos.column, name.raw);
     return result;
   }
 
   t = pop_token(tokens);
   if (t.kind != TokenKind_Semi) {
-    result.error = "Expected ';', found something else";
+    result_set_error(result,
+                     "%s:%d:%d: Error: Expected '%c', found '%s'",
+                     name.pos.filepath, name.pos.line, name.pos.column, ';', name.raw);
     return result;
   }
 
