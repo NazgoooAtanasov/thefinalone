@@ -9,6 +9,7 @@ typedef enum {
   CompileTarget_UKNOWN_TARGET
 } CompileTarget;
 
+uint32_t compile_type_size(Type type);
 void compile_to_target(CompileTarget target, AST* ast);
 
 #endif // TARGET_H

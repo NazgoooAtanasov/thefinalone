@@ -2,6 +2,43 @@
 #include "vendor/string_builder.h"
 #include <stdio.h>
 
+uint32_t compile_type_size(Type type) {
+  switch (type) {
+    case Type_i32: return 4; // 4 bytes 
+    default: fail_if(true, "UNREACHABLE");
+  }
+}
+
+void compile_body_node(BodyNode* body, StringBuilder* sb) {
+  uint32_t local_variables_size = 0;
+
+  for (uint32_t i = 0; i < body->statements_count; ++i) {
+    StatementNode statement = body->statements[i];
+    if (statement.type == StatementType_VariableAssign) {
+      VariableAssignStatement* assign = statement.statement;
+      local_variables_size += compile_type_size(assign->type);
+    }
+  }
+
+  if (local_variables_size <= 0) return;
+
+  string_builder_append_strf(sb, "\tsub rsp, %d\n", local_variables_size);
+
+  for (uint32_t i = 0; i < body->statements_count; ++i) {
+    StatementNode statement = body->statements[i];
+    if (statement.type == StatementType_VariableAssign) {
+      VariableAssignStatement* assign = statement.statement;
+
+      uint32_t type_size = compile_type_size(assign->type);
+      string_builder_append_strf(sb, "\tmov %s [rpb-%d], %s\t; variable name %s\n",
+                                 type_size == 4 ? "dword" : "UNDEFINED",
+                                 type_size * i,
+                                 assign->literal_value,
+                                 assign->name);
+    }
+  }
+}
+
 void compile_function_node(FunctionNode* function, StringBuilder* sb) {
   string_builder_append_str(sb, function->name, strlen(function->name));
   string_builder_append_str(sb, ":\n", 2);
@@ -11,7 +48,7 @@ void compile_function_node(FunctionNode* function, StringBuilder* sb) {
 
   string_builder_append_str(sb, stack_frame_begin, strlen(stack_frame_begin));
 
-  // @TODO(n): compile body
+  compile_body_node(function->body, sb);
 
   const char* stack_frame_end = "\tmov rps, rbp\n"
     "\tpop rbp\n"

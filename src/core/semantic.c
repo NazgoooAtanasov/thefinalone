@@ -7,9 +7,18 @@ void check_function_arguments(FunctionNode* function) {
           0, 0, function->name);
 }
 
+void check_body(BodyNode* body) {
+  for (uint32_t i = 0; i < body->statements_count; ++i) {
+    StatementNode statement = body->statements[i];
+    if (statement.type == StatementType_VariableAssign) {
+      VariableAssignStatement* assign = statement.statement;
+    }
+  }
+}
+
 void check_function(FunctionNode* function) {
   check_function_arguments(function);
-  // @TODO(n): handle semantic checks per function
+  check_body(function->body);
 }
 
 void check_root(RootNode* root) {

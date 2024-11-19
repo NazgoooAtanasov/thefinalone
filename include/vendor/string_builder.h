@@ -69,6 +69,11 @@
 #define SIZE_T size_t
 #endif
 
+#ifndef STRING_BUILDER_NO_STDARG
+#include <stdarg.h>
+#include <stdio.h>
+#endif
+
 #ifndef STRING_BUILDER_CHAR_CAPACITY
 #define STRING_BUILDER_CHAR_CAPACITY 1024 * 8 // 8KB initial storage
 #endif
@@ -86,6 +91,10 @@ typedef struct {
 STRING_BUILDER_DEF void string_builder_null(StringBuilder* sb);
 STRING_BUILDER_DEF void string_builder_append_chr(StringBuilder* sb, const char value);
 STRING_BUILDER_DEF void string_builder_append_str(StringBuilder* sb, const char* value, SIZE_T len);
+
+#ifndef STRING_BUILDER_NO_STDARG
+STRING_BUILDER_DEF void string_builder_append_strf(StringBuilder* sb, const char* format, ...);
+#endif
 
 #endif // end of header file STRING_BUILDER_H
 
@@ -105,5 +114,18 @@ STRING_BUILDER_DEF void string_builder_append_str(StringBuilder* sb, const char*
     string_builder_append_chr(sb, value[i]);
   }
 }
+
+#ifndef STRING_BUILDER_NO_STDARG
+STRING_BUILDER_DEF void string_builder_append_strf(StringBuilder* sb, const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+
+  char temp[1024];
+  int bytes_written = vsnprintf(temp, 1024, format, args);
+  string_builder_append_str(sb, temp, bytes_written);
+
+  va_end(args);
+}
+#endif
 
 #endif // end of implementation file STRING_BUILDER_IMPLEMENTATION

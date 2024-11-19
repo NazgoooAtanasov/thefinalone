@@ -5,19 +5,15 @@
 #include "core/toker.h"
 #include "vendor/result.h"
 
-
 typedef enum {
-  Type_i32
+  Type_i32,
+  Type_Capacity
 } Type;
 
 typedef enum StatementType {
   StatementType_UNKNOWN,
   StatementType_VariableAssign,
 } StatementType;
-
-#ifdef COMPILER_DEBUG
-const char* ast_statement_type_to_str(StatementType type);
-#endif
 
 typedef struct {
   char name[TOKEN_RAW_CAPACITY];
@@ -64,9 +60,9 @@ typedef struct {
   RootNode* root;
 } AST;
 
-
 #ifdef COMPILER_DEBUG
 const char* ast_type_to_str(Type type);
+const char* ast_statement_type_to_str(StatementType type);
 #endif
 
 AST* parse_ast(Tokens* tokens);
