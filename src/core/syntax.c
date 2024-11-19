@@ -97,7 +97,11 @@ void parse_body(Tokens* tokens) {
           "%s:%d:%d: Error: Expected '%s', but got '%s'\n",
           t.pos.filepath, t.pos.line, t.pos.column, "{", t.raw);
 
-  parse_statement(tokens);
+  t = peek_token(tokens);
+  while (t.kind != TokenKind_Close_Curl_Paren) {
+    parse_statement(tokens);
+    t = peek_token(tokens);
+  }
 
   t = pop_token(tokens);
   fail_if(t.kind != TokenKind_Close_Curl_Paren,

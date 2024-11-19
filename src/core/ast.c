@@ -117,13 +117,17 @@ BodyNode* parse_body_node(Tokens* tokens) {
   pop_token(tokens); // popping the body
 
   Token t = peek_token(tokens);
-  if (t.kind == TokenKind_Identifier) {
-    Result variable_assign = parse_variable_assign_node(tokens);
-    if (result_is_ok(&variable_assign)) {
-      body->statements[body->statements_count].type = StatementType_VariableAssign;
-      body->statements[body->statements_count].statement = result_unwrap(&variable_assign);
-      body->statements_count++;
+  while (t.kind != TokenKind_Close_Curl_Paren) {
+    if (t.kind == TokenKind_Identifier) {
+      Result variable_assign = parse_variable_assign_node(tokens);
+      if (result_is_ok(&variable_assign)) {
+        body->statements[body->statements_count].type = StatementType_VariableAssign;
+        body->statements[body->statements_count].statement = result_unwrap(&variable_assign);
+        body->statements_count++;
+      }
     }
+
+    t = peek_token(tokens);
   }
   // @TODO(n): handle multiple statements in a body.
 

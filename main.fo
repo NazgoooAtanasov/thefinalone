@@ -1,3 +1,4 @@
 func main(): i32 {
     thing: i32 = 15;
+    thing: i32 = 15;
 }
