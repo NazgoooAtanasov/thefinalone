@@ -113,6 +113,7 @@ Result parse_variable_assign_node(Tokens* tokens) {
 BodyNode* parse_body_node(Tokens* tokens) {
   BodyNode* body = malloc(sizeof(BodyNode));
   memset(body, 0, sizeof(BodyNode));
+  body->variables = assoc_array_new();
 
   pop_token(tokens); // popping the body
 
@@ -129,7 +130,6 @@ BodyNode* parse_body_node(Tokens* tokens) {
 
     t = peek_token(tokens);
   }
-  // @TODO(n): handle multiple statements in a body.
 
   pop_token(tokens); // popping the body
   return body;

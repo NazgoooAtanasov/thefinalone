@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "core/toker.h"
 #include "vendor/result.h"
+#include "vendor/assoc_array.h"
 
 typedef enum {
   Type_i32,
@@ -30,6 +31,7 @@ typedef struct {
 typedef struct {
   StatementNode statements[AST_MAX_BODY_STATEMENTS];
   uint32_t statements_count;
+  AssocArray variables; // assigned and filled in on semantic check
 } BodyNode;
 
 typedef struct {

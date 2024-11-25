@@ -1,5 +1,4 @@
 #include "core/semantic.h"
-#include "util.h"
 
 void check_function_arguments(FunctionNode* function) {
   fail_if(function->arguments->arguments_count > AST_MAX_ARGUMENTS,
@@ -12,7 +11,12 @@ void check_body(BodyNode* body) {
     StatementNode statement = body->statements[i];
     if (statement.type == StatementType_VariableAssign) {
       VariableAssignStatement* assign = statement.statement;
-    }
+
+      fail_if(assoc_array_has(&body->variables, assign->name), 
+            "filename:%d:%d: Error: Variable with the name '%s' already exists\n", 0, 0, assign->name);
+
+      assoc_array_put(&body->variables, assign->name, assign->literal_value);
+    } 
   }
 }
 

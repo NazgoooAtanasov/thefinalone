@@ -4,6 +4,9 @@
 #define RESULT_H_IMPLEMENTATION
 #include "vendor/result.h"
 
+#define ASSOC_ARRAY_IMPLEMENTATION
+#include "vendor/assoc_array.h"
+
 #include "core/cmd.h"
 
 int main(int argc, char** argv) {
