@@ -3,6 +3,17 @@
 #include "util.h"
 #include "vendor/result.h"
 
+bool keyword_is_type(TokenKeywordKind keyword_kind) {
+  switch (keyword_kind) {
+    case TokenKeywordKind_voidType:
+    case TokenKeywordKind_i32Type: 
+      return true;
+
+    case TokenKeywordKind_FunctionDef: return false;
+    default: fail_if(true, "Bail out. UNKNOWN keyword kind")
+  }
+}
+
 void parse_func_args(Tokens* tokens) {
   Token t = peek_token(tokens);
 
@@ -16,9 +27,9 @@ void parse_func_args(Tokens* tokens) {
               t.pos.filepath, t.pos.line, t.pos.column, ":", t.raw);
 
       t = pop_token(tokens);
-      fail_if(t.kind != TokenKind_Keyword || t.keyword != TokenKeywordKind_i32Type, // @TODO(n): in the future, make sure this handles all kinds of different types
-              "%s:%d:%d: Error: Expected '%s', but got '%s'\n",
-              t.pos.filepath, t.pos.line, t.pos.column, "i32", t.raw);
+      fail_if(t.kind != TokenKind_Keyword || !keyword_is_type(t.keyword),
+              "%s:%d:%d: Error: Expected type, but got '%s'\n",
+              t.pos.filepath, t.pos.line, t.pos.column, t.raw);
 
       t = peek_token(tokens);
       if (t.kind == TokenKind_Comma) {
@@ -138,9 +149,9 @@ void parse_func(Tokens* tokens) {
           t.pos.filepath, t.pos.line, t.pos.column, ":", t.raw);
 
   t = pop_token(tokens);
-  fail_if(t.kind != TokenKind_Keyword || t.keyword != TokenKeywordKind_i32Type, // @TODO(n): in the future, make sure this handles all kinds of different types
-          "%s:%d:%d: Error: Expected '%s', but got '%s'\n",
-          t.pos.filepath, t.pos.line, t.pos.column, "i32", t.raw);
+  fail_if(t.kind != TokenKind_Keyword || !keyword_is_type(t.keyword),
+          "%s:%d:%d: Error: Expected type, but got '%s'\n",
+          t.pos.filepath, t.pos.line, t.pos.column, t.raw);
 
   parse_body(tokens);
 }

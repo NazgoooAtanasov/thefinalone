@@ -47,7 +47,11 @@ TokenKeywordKind keyword_kind(const char* raw) {
     return TokenKeywordKind_i32Type;
   }
 
-  assert(TokenKeywordKind_UNKNOWN == 2 && "New keyword kind has been added but not handled!");
+  if (strcmp(raw, "void") == 0) {
+    return TokenKeywordKind_voidType;
+  }
+
+  assert(TokenKeywordKind_UNKNOWN == 3 && "New keyword kind has been added but not handled!");
   return TokenKeywordKind_UNKNOWN;
 }
 

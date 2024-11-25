@@ -6,6 +6,7 @@
 const char* ast_type_to_str(Type type) {
   switch(type) {
     case Type_i32: return "i32";
+    case Type_void: return "void";
     default: return "UNKNOWN";
   }
 }
@@ -21,6 +22,7 @@ const char* ast_statement_type_to_str(StatementType type) {
 Type map_type(TokenKeywordKind kind) {
   switch(kind) {
     case TokenKeywordKind_i32Type: return Type_i32;
+    case TokenKeywordKind_voidType: return Type_void;
     default: fail_if(true, "Bail out, unknown type kind.");
   }
 }

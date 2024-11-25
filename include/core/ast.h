@@ -14,6 +14,7 @@ struct node_metadata {
 
 typedef enum {
   Type_i32,
+  Type_void,
   Type_Capacity
 } Type;
 

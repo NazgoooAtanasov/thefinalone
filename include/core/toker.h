@@ -27,6 +27,7 @@ typedef enum {
 typedef enum {
   TokenKeywordKind_FunctionDef,
   TokenKeywordKind_i32Type,
+  TokenKeywordKind_voidType,
   TokenKeywordKind_UNKNOWN
 } TokenKeywordKind;
 
