@@ -1,6 +1,8 @@
 -Iinclude/
 -Wall
 -Wextra
+-Werror
+-Wno-format-truncation
 -g
 -DCOMPILER_DEBUG
 -DRESULT_H_IMPLEMENTATION
