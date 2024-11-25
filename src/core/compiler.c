@@ -56,10 +56,12 @@ AST* compile(const char* filepath) {
   printf("==== AST ====\n");
   printf("[Functions]\n");
   for (uint32_t i = 0; i < ast->root->function_count; ++i) {
-    printf("\t[Function: %s, Arg count: %d, Return type: %s]\n",
+    printf("\t[Function: %s, Arg count: %d, Return type: %s, Start: %d:%d - End: %d:%d]\n",
            ast->root->functions[i]->name,
            ast->root->functions[i]->arguments->arguments_count,
-           ast_type_to_str(ast->root->functions[i]->return_type)
+           ast_type_to_str(ast->root->functions[i]->return_type),
+           ast->root->functions[i]->_meta.start.line, ast->root->functions[i]->_meta.start.column,
+           ast->root->functions[i]->_meta.end.line, ast->root->functions[i]->_meta.end.column
            );
     for (uint32_t j = 0; j < ast->root->functions[i]->arguments->arguments_count; ++j) {
       printf("\t\t[Argument: %s, Type: %s]\n",
@@ -68,8 +70,11 @@ AST* compile(const char* filepath) {
              );
     }
     for (uint32_t j = 0; j < ast->root->functions[i]->body->statements_count; ++j) {
-      printf("\t\t[Statement: %s]\n",
-             ast_statement_type_to_str(ast->root->functions[i]->body->statements[j].type));
+      printf("\t\t[Statement: %s, Start: %d:%d - End: %d:%d]\n",
+             ast_statement_type_to_str(ast->root->functions[i]->body->statements[j].type),
+             ast->root->functions[i]->body->statements[j]._meta.start.line, ast->root->functions[i]->body->statements[j]._meta.start.column,
+             ast->root->functions[i]->body->statements[j]._meta.end.line, ast->root->functions[i]->body->statements[j]._meta.end.column
+             );
     }
   }
   printf("==== AST ====\n\n");

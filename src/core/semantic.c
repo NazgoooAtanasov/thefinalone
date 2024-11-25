@@ -13,7 +13,12 @@ void check_body(BodyNode* body) {
       VariableAssignStatement* assign = statement.statement;
 
       fail_if(assoc_array_has(&body->variables, assign->name), 
-            "filename:%d:%d: Error: Variable with the name '%s' already exists\n", 0, 0, assign->name);
+              "%s:%d:%d: Error: Variable with the name '%s' already exists\n",
+              statement._meta.start.filepath,
+              statement._meta.start.line,
+              statement._meta.start.column,
+              assign->name
+              );
 
       assoc_array_put(&body->variables, assign->name, assign->literal_value);
     } 
@@ -34,7 +39,7 @@ void check_root(RootNode* root) {
     }
   }
 
-  fail_if(!has_main, "filename:%d:%d: Error: No main function found\n", 0, 0);
+  fail_if(!has_main, "%s:%d:%d: Error: No main function found\n", root->_meta.start.filepath, root->_meta.start.line, root->_meta.start.column);
 }
 
 void semantic_parse(AST* ast) {

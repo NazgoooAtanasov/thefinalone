@@ -35,10 +35,13 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
   ArgumentsNode* arguments = malloc(sizeof(ArgumentsNode));
   memset(arguments, 0, sizeof(ArgumentsNode));
 
-  pop_token(tokens); // popping the opening param
-  Token t = peek_token(tokens);
+  Token t = pop_token(tokens); // popping the opening param
+  t = peek_token(tokens);
+  arguments->_meta.start = t.pos;
+
   if (t.kind == TokenKind_Close_Paren) {
-    pop_token(tokens); // popping the close paren
+    t = pop_token(tokens); // popping the close paren
+    arguments->_meta.end = t.pos;
     return arguments;
   }
 
@@ -58,7 +61,8 @@ ArgumentsNode* parse_arguments_node(Tokens* tokens) {
     }
   } while(t.kind == TokenKind_Comma);
 
-  pop_token(tokens); // popping the closing param
+  t = pop_token(tokens); // popping the closing param
+  arguments->_meta.end = t.pos;
   return arguments;
 }
 
@@ -104,6 +108,8 @@ Result parse_variable_assign_node(Tokens* tokens) {
   strncpy(variable_assign->name, name.raw, TOKEN_RAW_CAPACITY);
   variable_assign->type = type;
   strncpy(variable_assign->literal_value, value.raw, TOKEN_RAW_CAPACITY);
+  variable_assign->_meta.start = name.pos;
+  variable_assign->_meta.end = t.pos;
 
   result.value = variable_assign;
 
@@ -115,15 +121,19 @@ BodyNode* parse_body_node(Tokens* tokens) {
   memset(body, 0, sizeof(BodyNode));
   body->variables = assoc_array_new();
 
-  pop_token(tokens); // popping the body
+  Token t = pop_token(tokens); // popping the body
+  body->_meta.start = t.pos;
 
-  Token t = peek_token(tokens);
+  t = peek_token(tokens);
   while (t.kind != TokenKind_Close_Curl_Paren) {
     if (t.kind == TokenKind_Identifier) {
       Result variable_assign = parse_variable_assign_node(tokens);
       if (result_is_ok(&variable_assign)) {
+        VariableAssignStatement* var = result_unwrap(&variable_assign);
         body->statements[body->statements_count].type = StatementType_VariableAssign;
-        body->statements[body->statements_count].statement = result_unwrap(&variable_assign);
+        body->statements[body->statements_count].statement = var;
+        body->statements[body->statements_count]._meta.start = var->_meta.start;
+        body->statements[body->statements_count]._meta.end = var->_meta.end;
         body->statements_count++;
       }
     }
@@ -131,7 +141,8 @@ BodyNode* parse_body_node(Tokens* tokens) {
     t = peek_token(tokens);
   }
 
-  pop_token(tokens); // popping the body
+  t = pop_token(tokens); // popping the body
+  body->_meta.end = t.pos;
   return body;
 }
 
@@ -139,12 +150,15 @@ FunctionNode* parse_function_node(Tokens* tokens) {
   FunctionNode* function = malloc(sizeof(FunctionNode));
 
   Token t = pop_token(tokens); // Poping the 'func' keyword
+  function->_meta.start = t.pos;
+
   t = pop_token(tokens);
   strncpy(function->name, t.raw, TOKEN_RAW_CAPACITY);
 
   function->arguments = parse_arguments_node(tokens);
   function->return_type = parse_type(tokens);
   function->body = parse_body_node(tokens);
+  function->_meta.end = function->body->_meta.end;
 
   return function;
 }
@@ -155,11 +169,14 @@ RootNode* parse_root_node(Tokens* tokens) {
 
   assert(root->function_count < FUNCTION_DEF_CAPACITY && "Bail out, out of function capacity.");
   Token t = peek_token(tokens);
+  root->_meta.start = t.pos;
+
   while (t.kind == TokenKind_Keyword && t.keyword == TokenKeywordKind_FunctionDef) {
     root->functions[root->function_count++] = parse_function_node(tokens);
     t = peek_token(tokens);
   }
 
+  root->_meta.end = t.pos;
   return root;
 }
 
