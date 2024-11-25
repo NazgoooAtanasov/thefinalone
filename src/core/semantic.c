@@ -2,8 +2,11 @@
 
 void check_function_arguments(FunctionNode* function) {
   fail_if(function->arguments->arguments_count > AST_MAX_ARGUMENTS,
-          "filename:%d:%d: Error: function with name %s has more arguments then the language can handle",
-          0, 0, function->name);
+          "%s:%d:%d: Error: function with name %s has more arguments then the language can handle",
+          function->_meta.start.filepath,
+          function->_meta.start.line,
+          function->_meta.start.column,
+          function->name);
 }
 
 void check_body(BodyNode* body) {
