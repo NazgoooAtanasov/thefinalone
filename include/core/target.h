@@ -5,6 +5,12 @@
 #include "vendor/string_builder.h"
 
 typedef enum {
+  IntrinsicKind_UNKNOWN,
+  IntrinsicKind_EXIT
+} IntrinsicKind;
+IntrinsicKind map_intrinsic_kind(const char* word);
+
+typedef enum {
   CompileTarget_x86_64_nasm,
   CompileTarget_UKNOWN_TARGET
 } CompileTarget;

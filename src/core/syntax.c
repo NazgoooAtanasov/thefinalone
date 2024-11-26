@@ -1,7 +1,4 @@
 #include "core/syntax.h"
-#include "core/toker.h"
-#include "util.h"
-#include "vendor/result.h"
 
 bool keyword_is_type(TokenKeywordKind keyword_kind) {
   switch (keyword_kind) {
@@ -89,16 +86,96 @@ Result parse_variable_assign(Tokens* tokens) {
   return result;
 }
 
+Result parse_function_call(Tokens* tokens) {
+  Result result = result_create_empty();
+
+  Token function_name = pop_token(tokens);
+  if (function_name.kind != TokenKind_Identifier && function_name.kind != TokenKind_Intrinsic) {
+    result_set_error(result, "%s:%d:%d: Error: Expected function name, but got '%s'", 
+                     function_name.pos.filepath, function_name.pos.line, function_name.pos.column,
+                     function_name.raw
+                     );
+    return result;
+  }
+
+  Token t = pop_token(tokens);
+  if (t.kind != TokenKind_Open_Paren) {
+    result_set_error(result, "%s:%d:%d: Error: Expected '(', but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column,
+                     t.raw
+                     );
+    return result;
+  };
+
+  t = peek_token(tokens);
+  while (t.kind != TokenKind_Close_Paren) {
+    t = pop_token(tokens);
+    if (t.kind != TokenKind_Identifier && t.kind != TokenKind_Literal) {
+      result_set_error(result, "%s:%d:%d: Error: Expected identifier or literal value, but got '%s'", 
+                       t.pos.filepath, t.pos.line, t.pos.column,
+                       t.raw
+                       );
+      return result;
+    }
+
+    t = peek_token(tokens);
+  }
+
+  t = pop_token(tokens);
+  if (t.kind != TokenKind_Close_Paren) {
+    result_set_error(result, "%s:%d:%d: Error: Expected ')', but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column,
+                     t.raw
+                     );
+
+    return result;
+  };
+
+  t = pop_token(tokens);
+  if (t.kind != TokenKind_Semi) {
+    result_set_error(result, "%s:%d:%d: Error: Expected ';', but got '%s'", 
+                     t.pos.filepath, t.pos.line, t.pos.column,
+                     t.raw
+                     );
+
+    return result;
+  }
+
+  return result;
+}
+
 void parse_statement(Tokens* tokens) {
   Token t = peek_token(tokens);
   if (t.kind == TokenKind_Identifier) {
-    Result variable = parse_variable_assign(tokens);
+    mark_point_tokens(tokens);
+      Result variable = parse_variable_assign(tokens);
+      if (result_is_ok(&variable)) {
+        return;
+      }
+    reset_point_tokens(tokens);
 
-    if (result_is_ok(&variable)) {
-      return;
-    }
+    mark_point_tokens(tokens);
+      Result function_call = parse_function_call(tokens);
+      if (result_is_ok(&function_call)) {
+        return;
+      }
+    reset_point_tokens(tokens);
 
-    fail_if(result_is_err(&variable), "%s\n", result_error(&variable));
+    fail_if(true, "%s\n%s\n",
+            result_error(&variable),
+            result_error(&function_call)
+            );
+  }
+
+  if (t.kind == TokenKind_Intrinsic) {
+    mark_point_tokens(tokens);
+      Result function_call = parse_function_call(tokens);
+      if (result_is_ok(&function_call)) {
+        return;
+      }
+    reset_point_tokens(tokens);
+
+    fail_if(true, "%s\n", result_error(&function_call));
   }
 }
 

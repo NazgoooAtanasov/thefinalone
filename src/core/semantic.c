@@ -10,6 +10,7 @@ void check_function_arguments(FunctionNode* function) {
 }
 
 void check_body(BodyNode* body) {
+  // @TODO(n): handle function calls
   for (uint32_t i = 0; i < body->statements_count; ++i) {
     StatementNode statement = body->statements[i];
     if (statement.type == StatementType_VariableAssign) {

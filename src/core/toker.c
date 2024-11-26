@@ -3,7 +3,7 @@
 
 #define is_whitespace(c) c == ' ' || c == '\t'
 #define is_num(c) (c >= '0' && c <= '9')
-#define is_alpha_num(c) (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || is_num(c)
+#define is_alpha_num(c) (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_') || is_num(c)
 
 bool is_literal(const char* word) {
   size_t len = strlen(word);
@@ -11,6 +11,14 @@ bool is_literal(const char* word) {
     if (!is_num(word[i])) return false;
   }
   return true;
+}
+
+bool is_intrinsic(const char* word) {
+  if (strcmp(word, "INTR_EXIT") == 0) {
+    return true;
+  }
+
+  return false;
 }
 
 #ifdef COMPILER_DEBUG
@@ -25,6 +33,9 @@ const char* token_kind_to_str(TokenKind kind) {
     case TokenKind_Identifier: return "Identifier";
     case TokenKind_Keyword: return "Keyword";
     case TokenKind_Comma: return "Comma";
+    case TokenKind_Intrinsic: return "Intrinsic";
+    case TokenKind_Eq: return "Eq";
+    case TokenKind_Semi: return "Semi";
     default: return "Unknown";
   }
 }
@@ -64,6 +75,15 @@ Token make_token(TokenKind kind, TokenKeywordKind keyword_kind, Position pos, co
   return token;
 }
 
+void mark_point_tokens(Tokens* tokens) {
+  tokens->_mark = tokens->iter;
+}
+
+void reset_point_tokens(Tokens* tokens) {
+  tokens->iter = tokens->_mark;
+  tokens->_mark = 0;
+}
+
 Token pop_token(Tokens* tokens) {
   assert(tokens->iter <= tokens->count && "Bail out, out of tokens range.");
   return tokens->tokens[tokens->iter++];
@@ -78,6 +98,7 @@ void init_tokens(Tokens* tokens) {
   tokens->tokens = malloc(TOKENS_CAPACITY * sizeof(Token));
   tokens->count = 0;
   tokens->capacity = TOKENS_CAPACITY;
+  tokens->_mark = 0;
 }
 
 void free_tokens(Tokens* tokens) {
@@ -123,12 +144,17 @@ Tokens tokenize(const char* filepath, const char* source) {
     if (buff_idx > 0) {
       TokenKind kind = TokenKind_Identifier;
       TokenKeywordKind keyword = keyword_kind(buff);
+
       if (keyword != TokenKeywordKind_UNKNOWN) {
         kind = TokenKind_Keyword;
       }
 
       if (is_literal(buff)) {
         kind = TokenKind_Literal;
+      }
+
+      if (is_intrinsic(buff)) {
+        kind = TokenKind_Intrinsic;
       }
 
       Token token = make_token(kind, keyword, (Position) {.filepath = tokens.source, .column = pos.column - buff_idx, .line = pos.line}, buff);

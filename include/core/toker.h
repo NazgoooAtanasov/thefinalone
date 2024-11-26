@@ -12,6 +12,7 @@
 typedef enum {
   TokenKind_Literal,
   TokenKind_Identifier,
+  TokenKind_Intrinsic,
   TokenKind_Keyword,
   TokenKind_Column,
   TokenKind_Comma,
@@ -53,9 +54,14 @@ typedef struct {
   uint32_t capacity;
   uint32_t iter;
   const char* source;
+
+  // for internal use. used to restore the tokens to specific mark when needed
+  uint32_t _mark;
 } Tokens;
 
 #define TOKENS_CAPACITY 1024 * 10
+void mark_point_tokens(Tokens* tokens);
+void reset_point_tokens(Tokens* tokens);
 void init_tokens(Tokens* tokens);
 void free_tokens(Tokens* tokens);
 void push_token(Tokens* tokens, Token token);

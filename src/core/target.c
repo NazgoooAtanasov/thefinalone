@@ -9,6 +9,11 @@ uint32_t compile_type_size(Type type) {
   }
 }
 
+IntrinsicKind map_intrinsic_kind(const char* word) {
+  if (strcmp(word, "INTR_EXIT") == 0)  return IntrinsicKind_EXIT;
+  return IntrinsicKind_UNKNOWN;
+}
+
 void compile_body_node(BodyNode* body, StringBuilder* sb) {
   uint32_t local_variables_size = 0;
 
@@ -20,9 +25,9 @@ void compile_body_node(BodyNode* body, StringBuilder* sb) {
     }
   }
 
-  if (local_variables_size <= 0) return;
-
-  string_builder_append_strf(sb, "\tsub rsp, %d\n", local_variables_size);
+  if (local_variables_size > 0) {
+    string_builder_append_strf(sb, "\tsub rsp, %d\n", local_variables_size);
+  };
 
   for (uint32_t i = 0; i < body->statements_count; ++i) {
     StatementNode statement = body->statements[i];
@@ -35,6 +40,24 @@ void compile_body_node(BodyNode* body, StringBuilder* sb) {
                                  type_size * i,
                                  assign->literal_value,
                                  assign->name);
+    } 
+
+    if (statement.type == StatementType_FunctionCall) {
+      FunctionCallStatement* call = statement.statement;
+      if (call->is_intrinsic) {
+        IntrinsicKind intrinsic_kind = map_intrinsic_kind(call->name);
+        switch (intrinsic_kind) {
+          case IntrinsicKind_EXIT: 
+            string_builder_append_strf(sb, "\tmov rax, 60\t; INTR_EXIT\n"
+                                           "\tmov rdi, 0\n"
+                                           "\tsyscall\n");
+            break;
+          default: 
+            fail_if(true, "UNREACHABLE");
+        }
+      } else {
+        string_builder_append_strf(sb, "\tcall %s\t; function call to %s\n", call->name, call->name);
+      }
     }
   }
 }

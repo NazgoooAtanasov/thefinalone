@@ -13,6 +13,7 @@ struct node_metadata {
 }; 
 
 typedef enum {
+  Type_UNKNOWN,
   Type_i32,
   Type_void,
   Type_Capacity
@@ -21,6 +22,7 @@ typedef enum {
 typedef enum StatementType {
   StatementType_UNKNOWN,
   StatementType_VariableAssign,
+  StatementType_FunctionCall,
 } StatementType;
 
 typedef struct {
@@ -29,6 +31,13 @@ typedef struct {
   char literal_value[TOKEN_RAW_CAPACITY];
   struct node_metadata _meta;
 } VariableAssignStatement;
+
+typedef struct {
+  char name[TOKEN_RAW_CAPACITY];
+  bool is_intrinsic;
+  // @TODO(n): add arguments to the call
+  struct node_metadata _meta;
+} FunctionCallStatement;
 
 typedef struct {
   StatementType type;
