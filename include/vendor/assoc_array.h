@@ -85,7 +85,7 @@ ASSOC_ARRAY_DEF ASSOC_ARRAY_BOOL assoc_array_has(AssocArray* assoc_array, assoc_
 ASSOC_ARRAY_DEF void* assoc_array_get(AssocArray* assoc_array, assoc_array_key_t key) {
   ASSOC_ARRAY_SIZE_T index = 0;
   for (index = 0; index < assoc_array->count; ++index) {
-    if (assoc_array->keys[index] == key) break;
+    if (strcmp(assoc_array->keys[index], key) == 0) break;
   }
 
   return assoc_array->values[index];

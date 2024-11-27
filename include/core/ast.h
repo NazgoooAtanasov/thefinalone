@@ -35,6 +35,7 @@ typedef struct {
   Type type;
   char literal_value[TOKEN_RAW_CAPACITY];
   struct node_metadata _meta;
+  uint32_t offset; // this is set by translation to the specified target. check more in target.(h/c)
 } VariableAssignStatement;
 
 typedef struct {

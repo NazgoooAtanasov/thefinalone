@@ -24,7 +24,7 @@ void check_body(BodyNode* body) {
               assign->name
               );
 
-      assoc_array_put(&body->variables, assign->name, assign->literal_value);
+      assoc_array_put(&body->variables, assign->name, assign);
     } 
   }
 }

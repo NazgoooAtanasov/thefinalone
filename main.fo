@@ -1,7 +1,4 @@
-func exit(): void {
-  INTR_EXIT(69);
-}
-
 func main(): i32 {
-  exit();
+  thing: i32 = 69;
+  INTR_EXIT(thing);
 }

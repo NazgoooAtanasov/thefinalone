@@ -47,12 +47,13 @@ void compile_body_node(BodyNode* body, StringBuilder* sb) {
     StatementNode statement = body->statements[i];
     if (statement.type == StatementType_VariableAssign) {
       VariableAssignStatement* assign = statement.statement;
-
       uint32_t type_size = compile_type_size(assign->type);
       offset += type_size;
+      assign->offset = offset;
+
       string_builder_append_strf(sb, "\tmov %s [rpb-%d], %s\t; variable name %s\n",
                                  compile_type_word(assign->type),
-                                 offset,
+                                 assign->offset,
                                  assign->literal_value,
                                  assign->name);
     } 
@@ -66,8 +67,13 @@ void compile_body_node(BodyNode* body, StringBuilder* sb) {
             string_builder_append_strf(sb, "\tmov rax, 60\t; INTR_EXIT\n");
 
             for (uint32_t i = 0; i < call->arguments_count; ++i) {
-              const char* arg = call->arguments[i];
-              string_builder_append_strf(sb, "\tmov %s, %s\n", register_map[i], arg);
+              char* arg = call->arguments[i];
+              if (assoc_array_has(&body->variables, arg)) {
+                VariableAssignStatement* assign = assoc_array_get(&body->variables, arg);
+                string_builder_append_strf(sb, "\tmov %s, [rbp-%d]\n", register_map[i], assign->offset);
+              } else {
+                string_builder_append_strf(sb, "\tmov %s, %s\n", register_map[i], arg);
+              }
             }
 
             string_builder_append_strf(sb, "\tsyscall\n");
