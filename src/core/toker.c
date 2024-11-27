@@ -44,6 +44,7 @@ const char* token_keyword_kind_to_str(TokenKeywordKind kind) {
   switch(kind) {
     case TokenKeywordKind_FunctionDef: return "FunctionDef";
     case TokenKeywordKind_i32Type: return "i32Type";
+    case TokenKeywordKind_i64Type: return "i64Type";
     default: return "Unknown";
   }
 }
@@ -58,11 +59,16 @@ TokenKeywordKind keyword_kind(const char* raw) {
     return TokenKeywordKind_i32Type;
   }
 
+  if (strcmp(raw, "i64") == 0) {
+    return TokenKeywordKind_i64Type;
+  }
+
+
   if (strcmp(raw, "void") == 0) {
     return TokenKeywordKind_voidType;
   }
 
-  assert(TokenKeywordKind_UNKNOWN == 3 && "New keyword kind has been added but not handled!");
+  assert(TokenKeywordKind_UNKNOWN == 4 && "New keyword kind has been added but not handled!");
   return TokenKeywordKind_UNKNOWN;
 }
 

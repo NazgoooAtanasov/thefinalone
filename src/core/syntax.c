@@ -4,6 +4,7 @@ bool keyword_is_type(TokenKeywordKind keyword_kind) {
   switch (keyword_kind) {
     case TokenKeywordKind_voidType:
     case TokenKeywordKind_i32Type: 
+    case TokenKeywordKind_i64Type: 
       return true;
 
     case TokenKeywordKind_FunctionDef: return false;
@@ -56,7 +57,7 @@ Result parse_variable_assign(Tokens* tokens) {
   }
 
   t = pop_token(tokens);
-  if (t.kind != TokenKind_Keyword || t.keyword != TokenKeywordKind_i32Type) {
+  if (t.kind != TokenKind_Keyword || !keyword_is_type(t.keyword)) {
     result_set_error(result, "%s:%d:%d: Error: Expected a type, but got '%s'", 
                      t.pos.filepath, t.pos.line, t.pos.column, t.raw);
     return result;

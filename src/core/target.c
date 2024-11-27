@@ -9,6 +9,15 @@ const char* register_map[] = {
 uint32_t compile_type_size(Type type) {
   switch (type) {
     case Type_i32: return 4; // 4 bytes 
+    case Type_i64: return 8; // 8 bytes 
+    default: fail_if(true, "UNREACHABLE");
+  }
+}
+
+const char* compile_type_word(Type type) {
+  switch (type) {
+    case Type_i32: return "dword"; // 4 bytes 
+    case Type_i64: return "qword"; // 8 bytes 
     default: fail_if(true, "UNREACHABLE");
   }
 }
@@ -33,15 +42,17 @@ void compile_body_node(BodyNode* body, StringBuilder* sb) {
     string_builder_append_strf(sb, "\tsub rsp, %d\n", local_variables_size);
   };
 
+  uint32_t offset = 0;
   for (uint32_t i = 0; i < body->statements_count; ++i) {
     StatementNode statement = body->statements[i];
     if (statement.type == StatementType_VariableAssign) {
       VariableAssignStatement* assign = statement.statement;
 
       uint32_t type_size = compile_type_size(assign->type);
+      offset += type_size;
       string_builder_append_strf(sb, "\tmov %s [rpb-%d], %s\t; variable name %s\n",
-                                 type_size == 4 ? "dword" : "UNDEFINED",
-                                 type_size * i,
+                                 compile_type_word(assign->type),
+                                 offset,
                                  assign->literal_value,
                                  assign->name);
     } 
