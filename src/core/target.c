@@ -2,6 +2,10 @@
 #include "vendor/string_builder.h"
 #include <stdio.h>
 
+const char* register_map[] = {
+  "rdi", "rsi", "rdx", "r10", "r8", "r9",
+};
+
 uint32_t compile_type_size(Type type) {
   switch (type) {
     case Type_i32: return 4; // 4 bytes 
@@ -48,9 +52,14 @@ void compile_body_node(BodyNode* body, StringBuilder* sb) {
         IntrinsicKind intrinsic_kind = map_intrinsic_kind(call->name);
         switch (intrinsic_kind) {
           case IntrinsicKind_EXIT: 
-            string_builder_append_strf(sb, "\tmov rax, 60\t; INTR_EXIT\n"
-                                           "\tmov rdi, 0\n"
-                                           "\tsyscall\n");
+            string_builder_append_strf(sb, "\tmov rax, 60\t; INTR_EXIT\n");
+
+            for (uint32_t i = 0; i < call->arguments_count; ++i) {
+              const char* arg = call->arguments[i];
+              string_builder_append_strf(sb, "\tmov %s, %s\n", register_map[i], arg);
+            }
+
+            string_builder_append_strf(sb, "\tsyscall\n");
             break;
           default: 
             fail_if(true, "UNREACHABLE");

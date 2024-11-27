@@ -15,6 +15,9 @@ typedef enum {
   CompileTarget_UKNOWN_TARGET
 } CompileTarget;
 
+// definition is located in target.c
+extern const char* register_map[]; 
+
 uint32_t compile_type_size(Type type);
 void compile_to_target(CompileTarget target, AST* ast);
 

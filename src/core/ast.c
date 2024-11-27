@@ -152,6 +152,8 @@ Result parse_function_call_node(Tokens* tokens) {
   }
 
   t = peek_token(tokens);
+  char arguments[AST_MAX_ARGUMENTS][TOKEN_RAW_CAPACITY] = {0};
+  uint32_t count = 0;
   while (t.kind != TokenKind_Close_Paren) {
     t = pop_token(tokens);
     if (t.kind != TokenKind_Identifier && t.kind != TokenKind_Literal) {
@@ -162,6 +164,11 @@ Result parse_function_call_node(Tokens* tokens) {
       return result;
     }
 
+    strncpy(arguments[count++], t.raw, TOKEN_RAW_CAPACITY);
+    if (count >= AST_MAX_ARGUMENTS) {
+      result_set_error(result, "%s:%d:%d: Error: Max arguments of function call exceeded", t.pos.filepath, t.pos.line, t.pos.column);
+      return result;
+    }
     t = peek_token(tokens);
   }
 
@@ -188,6 +195,8 @@ Result parse_function_call_node(Tokens* tokens) {
   function_call->_meta.start = function_name.pos;
   function_call->_meta.end = t.pos;
   function_call->is_intrinsic = function_name.kind == TokenKind_Intrinsic;
+  memcpy(function_call->arguments, arguments, sizeof(function_call->arguments));
+  function_call->arguments_count = count;
 
   result.value = function_call;
 

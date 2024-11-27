@@ -12,6 +12,10 @@ struct node_metadata {
   Position end;
 }; 
 
+#define AST_MAX_ARGUMENTS 6
+#define AST_MAX_BODY_STATEMENTS 1024
+#define FUNCTION_DEF_CAPACITY 1024
+
 typedef enum {
   Type_UNKNOWN,
   Type_i32,
@@ -35,7 +39,8 @@ typedef struct {
 typedef struct {
   char name[TOKEN_RAW_CAPACITY];
   bool is_intrinsic;
-  // @TODO(n): add arguments to the call
+  char arguments[AST_MAX_ARGUMENTS][TOKEN_RAW_CAPACITY];
+  uint32_t arguments_count;
   struct node_metadata _meta;
 } FunctionCallStatement;
 
@@ -45,7 +50,6 @@ typedef struct {
   struct node_metadata _meta;
 } StatementNode;
 
-#define AST_MAX_BODY_STATEMENTS 1024
 typedef struct {
   StatementNode statements[AST_MAX_BODY_STATEMENTS];
   uint32_t statements_count;
@@ -58,7 +62,6 @@ typedef struct {
   Type type;
 } Argument;
 
-#define AST_MAX_ARGUMENTS 6
 typedef struct {
   Argument args[AST_MAX_ARGUMENTS];
   uint32_t arguments_count;
@@ -73,7 +76,6 @@ typedef struct {
   struct node_metadata _meta;
 } FunctionNode;
 
-#define FUNCTION_DEF_CAPACITY 1024
 typedef struct {
   FunctionNode* functions[FUNCTION_DEF_CAPACITY];
   uint32_t function_count;
